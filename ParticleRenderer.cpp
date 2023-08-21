@@ -202,7 +202,7 @@ void ParticleRenderer::setColorizer(const IColorizer& colorizer) {//设置着色器
 
 static AutoPtr<IRenderContext> getContext(const RenderParams& params, Bitmap<Rgba>& bitmap) {//获取渲染上下文：渲染的前期准备接口类
     if (params.particles.doAntialiasing) {// 如果启用抗锯齿（FSAA）：消除画面中图形边缘的锯齿，使画面看起来更为平滑
-        if (params.particles.smoothed) {//如果启用平滑过滤
+        if (params.particles.smoothed) {//如果启用平滑化
             CubicSpline<2> kernel;// 使用CubicSpline二次核函数
             return makeAuto<SmoothedRenderContext>(bitmap, kernel);// 创建平滑过滤的渲染上下文 
         } else {
@@ -210,9 +210,9 @@ static AutoPtr<IRenderContext> getContext(const RenderParams& params, Bitmap<Rgb
         }
     } else {//不需要FSAA
         if (params.background.a() == 1.f) {// 如果背景不透明
-            return makeAuto<PreviewRenderContext<OverridePixelOp>>(bitmap);//创建预渲染上下文，进行OverridePixelOp操作：仅在原像素存在时覆盖像素
+            return makeAuto<PreviewRenderContext<OverridePixelOp>>(bitmap);//创建预渲染上下文，进行OverridePixelOp操作：覆盖式绘制，用新颜色直接覆盖原像素颜色 
         } else {//背景透明
-            return makeAuto<PreviewRenderContext<OverPixelOp>>(bitmap);//创建预渲染上下文，进行OverPixelOp操作：无条件覆盖像素，避免在透明背景下留下没有覆盖的残余像素
+            return makeAuto<PreviewRenderContext<OverPixelOp>>(bitmap);//创建预渲染上下文，进行OverPixelOp操作：叠加式绘制，在原颜色上叠加新颜色
         }
     }
 }
